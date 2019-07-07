@@ -79,7 +79,7 @@ public class DatafileServiceConnection implements ServiceConnection {
             DatafileClient datafileClient = new DatafileClient(
                     new Client(new OptlyStorage(context.getApplicationContext()),
                             LoggerFactory.getLogger(OptlyStorage.class),
-                            new PinnedSSLSocketFactory().getPinnedSslSocket(context.getApplicationContext(), PinnedSSLSocketFactory.HostType.CDN)),
+                            new PinnedSSLSocketFactory().getPinnedSslSocket(context.getApplicationContext(), PinnedSSLSocketFactory.Host.CDN)),
                     LoggerFactory.getLogger(DatafileClient.class));
 
             DatafileCache datafileCache = new DatafileCache(

@@ -64,7 +64,7 @@ public class DatafileService extends Service {
                 DatafileConfig datafileConfig = DatafileConfig.fromJSONString(extraDatafileConfig);
                 DatafileClient datafileClient = new DatafileClient(
                         new Client(new OptlyStorage(this.getApplicationContext()), LoggerFactory.getLogger(OptlyStorage.class),
-                                new PinnedSSLSocketFactory().getPinnedSslSocket(this.getApplicationContext(), PinnedSSLSocketFactory.HostType.CDN)),
+                                new PinnedSSLSocketFactory().getPinnedSslSocket(this.getApplicationContext(), PinnedSSLSocketFactory.Host.CDN)),
                         LoggerFactory.getLogger(DatafileClient.class));
                 DatafileCache datafileCache = new DatafileCache(
                         datafileConfig.getKey(),

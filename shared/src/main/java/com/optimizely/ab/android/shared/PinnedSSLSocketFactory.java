@@ -2,7 +2,6 @@ package com.optimizely.ab.android.shared;
 
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.util.Log;
 
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ public class PinnedSSLSocketFactory {
 
     private Logger logger = LoggerFactory.getLogger(PinnedSSLSocketFactory.class);
 
-    public enum HostType {
+    public enum Host {
         LOGX,
         CDN,
         API
@@ -41,9 +40,9 @@ public class PinnedSSLSocketFactory {
     private static final String DATAFILE_CERT_FILENAME = "DigiCertGlobalRootCA.crt";
     private static final String REST_API_CERT_FILENAME = "AmazonRootCA1.crt";
 
-    public SSLSocketFactory getPinnedSslSocket(Context context, HostType hostType) {
+    public SSLSocketFactory getPinnedSslSocket(Context context, Host host) {
         InputStream certificate = null;
-        switch (hostType){
+        switch (host){
             case LOGX:
                 Log.d("harika", "im in logx host");
                 certificate = getCert(context, EVENT_CERT_FILENAME);
@@ -66,6 +65,7 @@ public class PinnedSSLSocketFactory {
              Log.d("harika", "returning valid socket factory");
             return getSSLSocketFactory(certificate);
         } else {
+            //fail safe
             logger.error("Failed to create sslsocketfactory for the certificate");
             Log.d("harika", "no host");
             return null;

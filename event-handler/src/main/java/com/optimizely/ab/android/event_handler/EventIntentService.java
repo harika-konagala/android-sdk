@@ -65,7 +65,7 @@ public class EventIntentService extends IntentService {
         OptlyStorage optlyStorage = new OptlyStorage(this);
         EventClient eventClient = new EventClient(new Client(optlyStorage,
                 LoggerFactory.getLogger(Client.class),
-                new PinnedSSLSocketFactory().getPinnedSslSocket(this.getApplicationContext(), PinnedSSLSocketFactory.HostType.LOGX)),
+                new PinnedSSLSocketFactory().getPinnedSslSocket(this.getApplicationContext(), PinnedSSLSocketFactory.Host.LOGX)),
                 LoggerFactory.getLogger(EventClient.class));
         EventDAO eventDAO = EventDAO.getInstance(this, "1", LoggerFactory.getLogger(EventDAO.class));
         ServiceScheduler serviceScheduler = new ServiceScheduler(

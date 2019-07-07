@@ -50,7 +50,7 @@ public class DefaultDatafileHandler implements DatafileHandler {
     public String downloadDatafile(Context context, DatafileConfig datafileConfig) {
         DatafileClient datafileClient = new DatafileClient(
                 new Client(new OptlyStorage(context), LoggerFactory.getLogger(OptlyStorage.class),
-                        new PinnedSSLSocketFactory().getPinnedSslSocket(context.getApplicationContext(), PinnedSSLSocketFactory.HostType.CDN)),
+                        new PinnedSSLSocketFactory().getPinnedSslSocket(context.getApplicationContext(), PinnedSSLSocketFactory.Host.CDN)),
                 LoggerFactory.getLogger(DatafileClient.class));
 
         String datafileUrl = datafileConfig.getUrl();
