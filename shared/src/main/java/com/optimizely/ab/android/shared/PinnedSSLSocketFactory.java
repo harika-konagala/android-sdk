@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -44,14 +45,14 @@ public class PinnedSSLSocketFactory {
         InputStream certificate = null;
         switch (host){
             case LOGX:
-                Log.d("harika", "im in logx host");
+                Log.d("pinnedLogs", "im in logx host");
                 certificate = getCert(context, EVENT_CERT_FILENAME);
-                Log.d("harika", "returning logx host");
+                Log.d("pinnedLogs", "returning logx host");
                 break;
             case CDN:
-                Log.d("harika", "im in cdn host");
+                Log.d("pinnedLogs", "im in cdn host");
                 certificate = getCert(context, DATAFILE_CERT_FILENAME);
-                 Log.d("harika", "returning cdn host");
+                 Log.d("pinnedLogs", "returning cdn host");
                 break;
             case API:
                 certificate = getCert(context, REST_API_CERT_FILENAME);
@@ -62,12 +63,12 @@ public class PinnedSSLSocketFactory {
 
         // Return null, if no certificate exists
         if (certificate != null) {
-             Log.d("harika", "returning valid socket factory");
+             Log.d("pinnedLogs", "returning valid socket factory");
             return getSSLSocketFactory(certificate);
         } else {
             //fail safe
             logger.error("Failed to create sslsocketfactory for the certificate");
-            Log.d("harika", "no host");
+            Log.d("pinnedLogs", "no host");
             return null;
         }
     }
@@ -75,12 +76,12 @@ public class PinnedSSLSocketFactory {
     private InputStream getCert(Context context, String certFilename) {
         InputStream certificate = null;
         try {
-             Log.d("harika", "opening cert file");
+             Log.d("pinnedLogs", "opening cert file");
             certificate = context.getAssets().open(certFilename);
         } catch (IOException e) {
             e.printStackTrace();
         }
-         Log.d("harika", "returning cert file");
+         Log.d("pinnedLogs", "returning cert file");
         return certificate;
     }
 
@@ -95,37 +96,38 @@ public class PinnedSSLSocketFactory {
         try {
 
             // Load trusted CAs from the input stream - Could be from a resource or ByteArrayInputStream
-            Log.d("harika", "loading certificate...");
+            Log.d("pinnedLogs", "loading certificate...");
             Certificate ca;
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             ca = cf.generateCertificate(input);
+            Log.d("pinnedLogs", "ca= " + ((X509Certificate) ca).getSubjectDN());
             input.close();
-            Log.d("harika", "loaded certificate");
+            Log.d("pinnedLogs", "loaded certificate");
 
-            // Create a keystore containing trusted certificates
-            Log.d("harika", "creating keystore");
+            // Create a KeyStore containing our trusted CAs
+            Log.d("pinnedLogs", "creating keystore");
             KeyStore keyStore;
             String keyStoreType = KeyStore.getDefaultType();
             keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", ca);
-            Log.d("harika", "created key store");
+            Log.d("pinnedLogs", "created key store");
 
-            // Create a custom TrustManager from the trusted CAs in the keystore
-            Log.d("harika", "creating trust managers");
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            Log.d("pinnedLogs", "creating trust managers");
             TrustManager[] trustManagers;
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
             tmf.init(keyStore);
             trustManagers = tmf.getTrustManagers();
-            Log.d("harika", "created trust managers");
+            Log.d("pinnedLogs", "created trust managers");
 
-            // Create a SSLContext from the TrustManager
-            Log.d("harika", "creating ssl context");
+            // Create an SSLContext that uses our TrustManager
+            Log.d("pinnedLogs", "creating ssl context");
             SSLContext mSslContext = SSLContext.getInstance("TLS");
             mSslContext.init(null, trustManagers, null);
 
-             Log.d("harika", "created sslcontext and returning socket factory");
+             Log.d("pinnedLogs", "created sslcontext and returning socket factory");
             // Return a SocketFactory object for the SSLContext
             return mSslContext.getSocketFactory();
         } catch (CertificateException e) {

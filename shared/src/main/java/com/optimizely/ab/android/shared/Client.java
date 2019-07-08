@@ -30,7 +30,10 @@ import java.net.URLConnection;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -79,20 +82,31 @@ public class Client {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            // use custom SSLSocketFactory, if any, for HTTPS
+            // use custom SSLSocketFactory from our SSLContext, if any, for HTTPS
             if ("https".equals(url.getProtocol()) && mSslSocketFactory != null) {
-                Log.d("harika", "attaching socket factory for " + url.getHost());
+                Log.d("pinnedLogs", "attaching socket factory for " + url.getHost());
 
+                HostnameVerifier hostnameVerifier = getHostnameVerifier(url);
+                // use our custom HostnameVerifier
+                ((HttpsURLConnection) connection).setHostnameVerifier(hostnameVerifier);
                 ((HttpsURLConnection) connection).setSSLSocketFactory(mSslSocketFactory);
-                Log.d("harika", "attached socket factory");
+
+                Log.d("pinnedLogs", "attached socket factory");
             }
 
-//            Log.d("harika", "no host so cannot attach socket factory");
             return connection;
         } catch (Exception e) {
             logger.warn("Error making request to {}.", url);
         }
         return null;
+    }
+
+
+    private HostnameVerifier getHostnameVerifier(URL url) {
+        return (hostname, session) -> {
+            HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
+            return hv.verify(url.getHost(), session);
+        };
     }
 
     /**
